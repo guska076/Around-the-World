@@ -1,5 +1,71 @@
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin: 0; padding: 0; border: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family: inherit; vertical-align: baseline }
+:focus{outline: 0 }
+body{line-height: 1; color: black; background: white }
+ul{list-style: none } table{border-collapse: separate; border-spacing: 0 }
+caption,th,td{text-align: left; font-weight: normal }
+blockquote:before,blockquote:after,q:before,q:after{content: "" }
+blockquote,q{quotes: "" "" } html,body,input,textarea,form{margin: 0; padding: 0; font: 12px Tahoma,Arial,Helvetica,sans-serif; color: #383838 }
+div{text-align: left }
+strong{font-weight: bold }
+a{text-decoration: none }
+a:link,a:visited{color: #167aa8 }
+a:hover{color: #329bcb }
 #pano_photos {
 	width:100%;
 	height:100%;
 	background:#aaa;
+}
+#map {
+	height:600px;
+	width:100%;
+}
+#top_bar {
+	position:absolute;
+	top:0;
+	margin:0 auto;
+	background:url("../img/desk_bg.jpg") repeat-y;
+	min-height:50px;
+	left: 50%;
+    margin-left: -25%;
+    width: 50%;
+	z-index:100;
+	padding:5px 10px 5px 10px;
+}
+#top_bar img {
+	float:left;
+}
+h1 {
+	color:white;
+	font-size:24px;
+	float:left;
+	margin: 10px 10px 0;
+	font-weight:bold;
+}
+a#info {
+	float:right;
+	margin:8px 5px 0 0;
+}
+@media only screen and (max-width: 700px) {
+	#top_bar {
+		width: 100%;
+		min-width:315px;
+		margin:0;
+		left:0;
+	}
+}
+#top_bar {
+	-webkit-box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+	-moz-box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+	box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+}
+#top_bar:before {
+	-webkit-box-shadow:0 0 15px rgba(0,0,0,0.6);
+	-moz-box-shadow:0 0 15px rgba(0,0,0,0.6);
+	box-shadow:0 0 15px rgba(0,0,0,0.6);
+	top:50%;
+	bottom:0;
+	left:10px;
+	right:10px;
+	-moz-border-radius:100px / 10px;
+	border-radius:100px / 10px;
 }
