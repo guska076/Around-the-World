@@ -41,6 +41,10 @@ h1 {
 	margin: 10px 10px 0;
 	font-weight:bold;
 }
+h2 {
+	font-weight:bold;
+	font-size:14px;
+}
 a#info {
 	float:right;
 	margin:8px 5px 0 0;
