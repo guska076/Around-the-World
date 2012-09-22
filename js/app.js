@@ -5,6 +5,7 @@ $(document).ready(function() {
 	'lodging','museum','night_club','park','restaurant','spa','stadium','subway_station','train_station','zoo','natural_feature',
 	'point_of_interest'
 	];
+	var panoramioPhotosView = true, googlePlacesView = false;
 	map_options = {
 		center: new google.maps.LatLng(lat, lon),
 		zoom: 14,
@@ -27,6 +28,8 @@ $(document).ready(function() {
 				lon = position.coords.longitude;
 				callback();
 				markersNearby(lat,lon,'');
+				googlePlacesView = true;
+				$('input#places').attr('checked',true);
 			},
 			function(error) {
 				var error_msg = '';
@@ -59,15 +62,13 @@ $(document).ready(function() {
 		
 	}
 	var panoramioLayer = new google.maps.panoramio.PanoramioLayer();
-	map.setCenter(new google.maps.LatLng(lat, lon));
 	panoramioLayer.setMap(map);
 	getLocation(initApp);
 	function initApp()
 	{
 		//getNearbyPhotos(lat,lon);
 		//pano_options = {'rect': {'sw': {'lat': lat-0.002, 'lng': lon-0.002}, 'ne': {'lat': lat+0.002, 'lng': lon+0.002}}};
-		
-		
+		map.setCenter(new google.maps.LatLng(lat, lon));
 		google.maps.event.addListener(panoramioLayer, 'click', function(event) {
 
 			//console.log(event);
@@ -75,7 +76,7 @@ $(document).ready(function() {
 		// media query event handler
 		if (matchMedia) {
 			var mq = window.matchMedia("(min-width: 800px)");
-			mq.addListener(WidthChange);
+			//mq.addListener(WidthChange);
 			//WidthChange(mq);
 			$(window).resize(function() {
 				//WidthChange(mq);
@@ -86,7 +87,6 @@ $(document).ready(function() {
 				*/
 			});
 		}
-		
 		//init panoramio widget
 		//var photo_ex_options = {'width': w, 'height': h};
 		//var photo_ex_widget = new panoramio.PhotoWidget('pano_photos', pano_options, photo_ex_options);
@@ -108,11 +108,6 @@ $(document).ready(function() {
 		markersArray.push(marker);
 		google.maps.event.addListener(marker,"click",function()
 		{
-			/*detail(refek,function(detale){
-				marker.txt = '<div style="color:black;height:100px;"><a style="color:black;font-size:16px;font-weight:bold;" href="'+detale.result.url+'">'+detale.result.name+'</a><br />'+detale.result.formatted_address+'<br /> '+detale.result.formatted_phone_number+'</div>';
-				dymek.setContent(marker.txt);
-				dymek.open(map,marker);
-			});*/
 			infowindow.setContent('<h2>'+place.name+'</h2>'+place.vicinity);
 			infowindow.open(map,marker);
 		});
@@ -171,14 +166,12 @@ $(document).ready(function() {
 			dataType: 'jsonp',
 			success: function(data) {
 				//console.log('http://www.panoramio.com/map/get_panoramas.php?set=public&from=0&to=20&minx='+(lat-0.002)+'&miny='+(lon-0.002)+'&maxx='+(lat+0.002)+'&maxy='+(lon+0.002)+'&size=medium&mapfilter=true');
-				console.log(data);
+
 			}
 		});
 	}
-	var panoramioPhotosView = true;
-	$('input#photos').change(function(){
-		//console.log(this.checked);
-		
+	
+	$('input#photos').change(function() {
 		if(panoramioPhotosView==true) {
 			panoramioLayer.setMap(null);
 			$(this).attr('checked',false);
@@ -188,6 +181,18 @@ $(document).ready(function() {
 			panoramioLayer.setMap(map);
 			$(this).attr('checked',true);
 			panoramioPhotosView = true;
+		}
+	});
+	$('input#places').change(function() {
+		if(googlePlacesView==true) {
+			clearOverlays();
+			$(this).attr('checked',false);
+			googlePlacesView = false;
+		}
+		else {
+			showOverlays();
+			$(this).attr('checked',true);
+			googlePlacesView = true;
 		}
 	});
 	// media query change
@@ -212,33 +217,14 @@ $(document).ready(function() {
 			}
 		}
 	}
+	function showOverlays() {
+		if (markersArray)
+		{
+			var markersArray_len = markersArray.length, i;
+			for (i = 0; i < markersArray_len; i++) {
+				markersArray[i].setMap(map);
+			}
+		}
+	}
 
 }); 
-/*
-geometry
-	Object { location=P}
-	
-html_attributions
-	[]
-	
-icon
-	"http://maps.gstatic.com...cons/electronics-71.png"
-	
-id
-	"c0f9bff3becd9470c98116cf4ed10cf2734d4c7d"
-	
-name
-	"Salon Orange Łódź"
-	
-opening_hours
-	Object { open_now=true}
-	
-reference
-	"CoQBcgAAADckgIcXNjFXShM...dG3EpVIb-6jbHLgDK4Qnzag"
-	
-types
-	["electronics_store", "store", "establishment"]
-	
-vicinity
-	"Aleja Marszałka Józefa Piłsudskiego 3, Łódź"
-*/
