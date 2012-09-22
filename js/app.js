@@ -1,15 +1,23 @@
 $(document).ready(function() {
-	var lat, lon, w, h, mq, pano_options, map_options, map;
+	var lat = 49.299181, lon = 19.9495621, w, h, mq, pano_options, map_options, map;
 	var mapDiv = document.getElementById('map'),markersArray = [], infowindow = new google.maps.InfoWindow(),
 	places_types = ['store','airport','amusement_park','aquarium','art_gallery','atm','bar','bus_station','cafe','casino','food','grocery_or_supermarket',
 	'lodging','museum','night_club','park','restaurant','spa','stadium','subway_station','train_station','zoo','natural_feature',
 	'point_of_interest'
 	];
-	var iconType = {};//709A36
+	map_options = {
+		center: new google.maps.LatLng(lat, lon),
+		zoom: 14,
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+		/*zoomControlOptions: {
+			position: google.maps.ControlPosition.LEFT_TOP
+		}*/
+	};
+	map = new google.maps.Map(mapDiv, map_options);
+	var iconType = {};//color:709A36
 	for(var i=0;i<places_types.length;i++) {
 		iconType[places_types[i]] = "markers/"+places_types[i]+".png";
 	}
-	//console.log(iconType);
 	// check for Geolocation support
 	function getLocation(callback)
 	{
@@ -19,36 +27,58 @@ $(document).ready(function() {
 				lon = position.coords.longitude;
 				callback();
 				markersNearby(lat,lon,'');
+			},
+			function(error) {
+				var error_msg = '';
+				switch(error.code)
+				{
+					case 0:
+					error_msg = 'Unknown error';
+					break;
+					case 1:
+					error_msg = 'Permission denied';
+					break;
+					case 2:
+					error_msg = 'Position unavailable (error response from locaton provider)';
+					break;
+					case 3:
+					error_msg = 'Timed out';
+					break;
+				}
+				alert('Error occurred. '+error_msg);
+				lat = 49.299181;
+				lon = 19.9495621;
 			});
 		}
 		else {
 			lat = 49.299181;
 			lon = 19.9495621;
 			callback();
-			//console.log('Geolocation is not supported for this Browser/OS version yet.');
-			
+			alert('Geolocation is not supported for this Browser/OS version yet.');
 		}
 		
 	}
-	
+	var panoramioLayer = new google.maps.panoramio.PanoramioLayer();
+	map.setCenter(new google.maps.LatLng(lat, lon));
+	panoramioLayer.setMap(map);
 	getLocation(initApp);
 	function initApp()
 	{
+		//getNearbyPhotos(lat,lon);
+		//pano_options = {'rect': {'sw': {'lat': lat-0.002, 'lng': lon-0.002}, 'ne': {'lat': lat+0.002, 'lng': lon+0.002}}};
 		
-		pano_options = {'rect': {'sw': {'lat': lat-0.002, 'lng': lon-0.002}, 'ne': {'lat': lat+0.002, 'lng': lon+0.002}}};
-		map_options = {
-			center: new google.maps.LatLng(lat, lon),
-			zoom: 14,
-			mapTypeId: google.maps.MapTypeId.ROADMAP
-		};
-		map = new google.maps.Map(mapDiv, map_options);
+		
+		google.maps.event.addListener(panoramioLayer, 'click', function(event) {
+
+			//console.log(event);
+		});
 		// media query event handler
 		if (matchMedia) {
 			var mq = window.matchMedia("(min-width: 800px)");
 			mq.addListener(WidthChange);
-			WidthChange(mq);
+			//WidthChange(mq);
 			$(window).resize(function() {
-				WidthChange(mq);
+				//WidthChange(mq);
 				/* Refresh widget
 				var photo_ex_options = {'width': w, 'height': h};
 				var photo_ex_widget = new panoramio.PhotoWidget('pano_photos', pano_options, photo_ex_options);
@@ -58,13 +88,12 @@ $(document).ready(function() {
 		}
 		
 		//init panoramio widget
-		var photo_ex_options = {'width': w, 'height': h};
-		var photo_ex_widget = new panoramio.PhotoWidget('pano_photos', pano_options, photo_ex_options);
-		photo_ex_widget.setPosition(0);
+		//var photo_ex_options = {'width': w, 'height': h};
+		//var photo_ex_widget = new panoramio.PhotoWidget('pano_photos', pano_options, photo_ex_options);
+		//photo_ex_widget.setPosition(0);
 	}
 	function addMarker(place)
 	{
-		//console.log(place.types);
 		var rozmiar = new google.maps.Size(33,40);
 		var punkt_startowy = new google.maps.Point(0,0);
 		var punkt_zaczepienia = new google.maps.Point(16,16);
@@ -74,7 +103,6 @@ $(document).ready(function() {
 			position: place.geometry.location,//new google.maps.LatLng(lat,lng),
 			map: map,
 			icon: icon1
-			//icon: //icon1
 		}
 		var marker = new google.maps.Marker(opcjeMarkera);
 		markersArray.push(marker);
@@ -109,7 +137,6 @@ $(document).ready(function() {
 	}
 	function getNearbyResults(results, status, pagination) {
 		clearOverlays();
-		//console.log(pagination);
 		if (status == google.maps.places.PlacesServiceStatus.OK) {
 			for(var i = 0; i < results.length; i++) {
 				addMarker(results[i]);
@@ -135,9 +162,34 @@ $(document).ready(function() {
 			else if(status == google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
 				console.log('Zero results.');
 			}
-			//console.log('Error '+status);
 		}
 	}
+	//(lon-diff, lon+diff, lat-diff, lat+diff);
+	function getNearbyPhotos(lat,lon) {
+		$.ajax({
+			url: 'http://www.panoramio.com/map/get_panoramas.php?set=full&from=0&to=20&minx='+(lon-0.002)+'&miny='+(lat-0.002)+'&maxx='+(lon+0.002)+'&maxy='+(lat+0.002)+'&size=medium&mapfilter=true',
+			dataType: 'jsonp',
+			success: function(data) {
+				//console.log('http://www.panoramio.com/map/get_panoramas.php?set=public&from=0&to=20&minx='+(lat-0.002)+'&miny='+(lon-0.002)+'&maxx='+(lat+0.002)+'&maxy='+(lon+0.002)+'&size=medium&mapfilter=true');
+				console.log(data);
+			}
+		});
+	}
+	var panoramioPhotosView = true;
+	$('input#photos').change(function(){
+		//console.log(this.checked);
+		
+		if(panoramioPhotosView==true) {
+			panoramioLayer.setMap(null);
+			$(this).attr('checked',false);
+			panoramioPhotosView = false;
+		}
+		else {
+			panoramioLayer.setMap(map);
+			$(this).attr('checked',true);
+			panoramioPhotosView = true;
+		}
+	});
 	// media query change
 	function WidthChange(mq) {
 		if (mq.matches) {
@@ -160,6 +212,7 @@ $(document).ready(function() {
 			}
 		}
 	}
+
 }); 
 /*
 geometry

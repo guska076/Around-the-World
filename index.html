@@ -4,10 +4,12 @@
         <meta charset="utf-8">
         <title>Around the World</title>
 		<meta name="description" content="Geolocation api">
+		<!--<meta name="viewport" content="initial-scale=1.0, user-scalable=no">-->
+		<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Oleo+Script">
 		<link rel="stylesheet" type="text/css" href="css/style.css">
-		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=true"></script>
+		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places,panoramio&sensor=true"></script>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-		<script type="text/javascript" src="http://www.panoramio.com/wapi/wapi.js?v=1"></script>
+		<!--<script type="text/javascript" src="http://www.panoramio.com/wapi/wapi.js?v=1"></script>-->
 		<script type="text/javascript" src="js/app.js"></script>
 	</head>
     <body>
@@ -17,7 +19,10 @@
 				<a id="info" href="#"><img src="img/onebit_38.png" alt="info"></a>
 			</div>
 			<div id="map"></div>
-			<div id="pano_photos"></div>
+			<!--<div id="pano_photos"></div>-->
+			<input type="checkbox" checked="checked" id="places"> Show/Hide Places<br>
+			<input type="checkbox" checked="checked" id="photos"> Show/Hide Photos
+			
 		</div>
     </body>
 </html>
