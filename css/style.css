@@ -102,4 +102,12 @@ a#info {
 	text-align:center;
 	height:32px;
 	width:60px;
+	border:none;
+	margin-top:2px;
+	padding: 2px 0 5px 1px;
+	cursor:pointer;
+	font-weight:bold;
+	color:white;
+	text-shadow:1px 1px 2px #709A36;
+	background: url("../img/sub.png") no-repeat;
 }
