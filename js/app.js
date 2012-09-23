@@ -1,5 +1,5 @@
 $(document).ready(function() {
-	var lat = 49.299181, lon = 19.9495621, w, h, mq, pano_options, map_options, map;
+	var lat = 49.299181, lon = 19.9495621, mq, pano_options, map_options, map;
 	var mapDiv = document.getElementById('map'),markersArray = [], infowindow = new google.maps.InfoWindow(),
 	places_types = ['store','airport','amusement_park','aquarium','art_gallery','atm','bar','bus_station','cafe','casino','food','grocery_or_supermarket',
 	'lodging','museum','night_club','park','restaurant','spa','stadium','subway_station','train_station','zoo','natural_feature',
@@ -27,7 +27,7 @@ $(document).ready(function() {
 				lat = position.coords.latitude;
 				lon = position.coords.longitude;
 				callback();
-				markersNearby(lat,lon,'');
+				markersNearby(lat,lon);
 				googlePlacesView = true;
 				$('input#places').attr('checked',true);
 			},
@@ -59,9 +59,8 @@ $(document).ready(function() {
 			callback();
 			alert('Geolocation is not supported for this Browser/OS version yet.');
 		}
-		
 	}
-	var panoramioLayer = new google.maps.panoramio.PanoramioLayer();
+	var panoramioLayer = new google.maps.panoramio.PanoramioLayer(), geocoder = new google.maps.Geocoder();
 	panoramioLayer.setMap(map);
 	getLocation(initApp);
 	function initApp()
@@ -70,23 +69,8 @@ $(document).ready(function() {
 		//pano_options = {'rect': {'sw': {'lat': lat-0.002, 'lng': lon-0.002}, 'ne': {'lat': lat+0.002, 'lng': lon+0.002}}};
 		map.setCenter(new google.maps.LatLng(lat, lon));
 		google.maps.event.addListener(panoramioLayer, 'click', function(event) {
-
 			//console.log(event);
 		});
-		// media query event handler
-		if (matchMedia) {
-			var mq = window.matchMedia("(min-width: 800px)");
-			//mq.addListener(WidthChange);
-			//WidthChange(mq);
-			$(window).resize(function() {
-				//WidthChange(mq);
-				/* Refresh widget
-				var photo_ex_options = {'width': w, 'height': h};
-				var photo_ex_widget = new panoramio.PhotoWidget('pano_photos', pano_options, photo_ex_options);
-				photo_ex_widget.setPosition(0);
-				*/
-			});
-		}
 		//init panoramio widget
 		//var photo_ex_options = {'width': w, 'height': h};
 		//var photo_ex_widget = new panoramio.PhotoWidget('pano_photos', pano_options, photo_ex_options);
@@ -100,7 +84,7 @@ $(document).ready(function() {
 		var icon1 = new google.maps.MarkerImage(iconType[place.types[0]]?iconType[place.types[0]]:iconType[place.types[1]],rozmiar,punkt_startowy,punkt_zaczepienia);
 		var opcjeMarkera =
 		{
-			position: place.geometry.location,//new google.maps.LatLng(lat,lng),
+			position: place.geometry.location,
 			map: map,
 			icon: icon1
 		}
@@ -112,16 +96,9 @@ $(document).ready(function() {
 			infowindow.open(map,marker);
 		});
 	}
-	function markersNearby(lat,lng,icon)
+	function markersNearby(lat,lng)
 	{
-		/*$.ajax(file).done(function(dane){
-			for(i=0;i<dane.results.length;i++)
-			{
-				var lat = parseFloat(dane.results[i].geometry.location.lat);
-				var lng = parseFloat(dane.results[i].geometry.location.lng)
-				addMarker(lat,lng,dane.results[i].id,dane.results[i].reference,icon);
-			}
-		});*/
+		clearOverlays();
 		var request = {
 			location: new google.maps.LatLng(lat,lng),
 			radius: '1000',
@@ -166,7 +143,6 @@ $(document).ready(function() {
 			dataType: 'jsonp',
 			success: function(data) {
 				//console.log('http://www.panoramio.com/map/get_panoramas.php?set=public&from=0&to=20&minx='+(lat-0.002)+'&miny='+(lon-0.002)+'&maxx='+(lat+0.002)+'&maxy='+(lon+0.002)+'&size=medium&mapfilter=true');
-
 			}
 		});
 	}
@@ -195,19 +171,21 @@ $(document).ready(function() {
 			googlePlacesView = true;
 		}
 	});
-	// media query change
-	function WidthChange(mq) {
-		if (mq.matches) {
-			// window width is at least 800px
-			w = 800;
-			h = 600;
-		}
-		else {
-			// window width is less than 800px
-			w = $(window).width();
-			h = 600;
-		}
-	}
+	//search places by input
+	$('#search_place').on('click',function() {
+		var place = $('#place').val();
+		geocoder.geocode( {'address': place}, function(results, status) {
+			if (status == google.maps.GeocoderStatus.OK) {
+				var geom_loc =results[0].geometry.location;
+				map.setCenter(geom_loc);
+				markersNearby(geom_loc.lat(),geom_loc.lng());
+			} else {
+				alert("Geocode was not successful for the following reason: " + status);
+			}
+		});		
+		return false;
+	});
+	
 	function clearOverlays() {
 		if (markersArray)
 		{

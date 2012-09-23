@@ -87,4 +87,19 @@ a#info {
 	-moz-border-radius:100px / 10px;
 	border-radius:100px / 10px;
 }
-
+#place {
+	height:20px;
+	color:#709A36;
+	padding:3px;
+	margin: 10px 0 0 3px;
+	width:187px;
+	border:1px solid #709A36;
+	-webkit-border-radius:5px;
+	-moz-border-radius:5px;
+	border-radius:5px;
+}
+#search_place {
+	text-align:center;
+	height:32px;
+	width:60px;
+}
