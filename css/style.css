@@ -41,9 +41,21 @@ div#page {
     width: 50%;
 	z-index:100;
 	padding:5px 10px 5px 10px;
+	color:white;
+	text-shadow:1px 1px 1px #709A36;
 }
 #top_bar img {
 	float:left;
+}
+#top_bar label {
+	
+}
+#places, #photos {
+	padding: 0;
+    margin:0;
+    vertical-align: bottom;
+    position: relative;
+    top: 1px;
 }
 h1 {
 	color:white;
