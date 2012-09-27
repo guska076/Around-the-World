@@ -1,6 +1,6 @@
 $(document).ready(function() {
 	var lat = 49.299181, lon = 19.9495621, mq, pano_options, map_options, map;
-	var mapDiv = document.getElementById('map'),markersArray = [], infowindow = new google.maps.InfoWindow(),
+	var mapDiv = document.getElementById('map'),markersArray = [], wikiArray = [], infowindow = new google.maps.InfoWindow(),
 	places_types = ['store','airport','amusement_park','aquarium','art_gallery','atm','bar','bus_station','cafe','casino','food','grocery_or_supermarket',
 	'lodging','museum','night_club','park','restaurant','spa','stadium','subway_station','train_station','zoo','natural_feature',
 	'point_of_interest'
@@ -28,6 +28,7 @@ $(document).ready(function() {
 				lon = position.coords.longitude;
 				callback();
 				markersNearby(lat,lon);
+				getNearbyWiki(lat,lon);
 				googlePlacesView = true;
 				$('input#places').attr('checked',true);
 			},
@@ -96,6 +97,26 @@ $(document).ready(function() {
 			infowindow.open(map,marker);
 		});
 	}
+	function addMarkerWiki(article)
+	{
+		var rozmiar = new google.maps.Size(24,24);
+		var punkt_startowy = new google.maps.Point(0,0);
+		var punkt_zaczepienia = new google.maps.Point(12,12);
+		var icon1 = new google.maps.MarkerImage('img/wikipedia.png',rozmiar,punkt_startowy,punkt_zaczepienia);
+		var opcjeMarkera =
+		{
+			position: new google.maps.LatLng(parseFloat(article.lat),parseFloat(article.lng)),
+			map: map,
+			icon: icon1
+		}
+		var marker = new google.maps.Marker(opcjeMarkera);
+		wikiArray.push(marker);
+		google.maps.event.addListener(marker,"click",function()
+		{
+			infowindow.setContent('<h2><a href="'+article.url+'">'+article.title+'</a></h2>');
+			infowindow.open(map,marker);
+		});
+	}
 	function markersNearby(lat,lng)
 	{
 		clearOverlays();
@@ -110,38 +131,47 @@ $(document).ready(function() {
 	function getNearbyResults(results, status, pagination) {
 		clearOverlays();
 		if (status == google.maps.places.PlacesServiceStatus.OK) {
-			for(var i = 0; i < results.length; i++) {
+			for(var i = 0; i < results.length; i+=1) {
 				addMarker(results[i]);
 			}
 		}
 		else
 		{
 			if(status == google.maps.places.PlacesServiceStatus.ERROR) {
-				console.log('There was a problem contacting the Google servers.');
+				alert('There was a problem contacting the Google servers.');
 			} 
 			else if(status == google.maps.places.PlacesServiceStatus.INVALID_REQUEST) {
-				console.log('This request was invalid.');
+				alert('This request was invalid.');
 			}
 			else if(status == google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT) {
-				console.log('The webpage has gone over its request quota. Google places api limitations.');
+				alert('The webpage has gone over its request quota. Google places api limitations.');
 			}
 			else if(status == google.maps.places.PlacesServiceStatus.REQUEST_DENIED) {
-				console.log('The webpage is not allowed to use the PlacesService.');
+				alert('The webpage is not allowed to use the PlacesService.');
 			}
 			else if(status == google.maps.places.PlacesServiceStatus.UNKNOWN_ERROR) {
-				console.log('The PlacesService request could not be processed due to a server error. The request may succeed if you try again.');
+				alert('The PlacesService request could not be processed due to a server error. The request may succeed if you try again.');
 			}
 			else if(status == google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
-				console.log('Zero results.');
+				alert('Zero results.');
 			}
 		}
 	}
 	//(lon-diff, lon+diff, lat-diff, lat+diff);
-	function getNearbyPhotos(lat,lon) {
+	function getNearbyWiki(lat,lon) {
 		$.ajax({
-			url: 'http://www.panoramio.com/map/get_panoramas.php?set=full&from=0&to=20&minx='+(lon-0.002)+'&miny='+(lat-0.002)+'&maxx='+(lon+0.002)+'&maxy='+(lat+0.002)+'&size=medium&mapfilter=true',
-			dataType: 'jsonp',
+			url: 'http://api.wikilocation.org/articles?lat='+lat+'&lng='+lon+'&radius=5000&jsonp=addPoi&callback=?',
+			dataType: 'json',
+			jsonpCallback: 'addPoi',
+			cache: false,
 			success: function(data) {
+				var data_len = data.articles.length;
+				for(var i = 0; i < data_len; i+=1) 
+				{
+					
+					addMarkerWiki(data.articles[i]);
+				}
+				//console.log(data);
 				//console.log('http://www.panoramio.com/map/get_panoramas.php?set=public&from=0&to=20&minx='+(lat-0.002)+'&miny='+(lon-0.002)+'&maxx='+(lat+0.002)+'&maxy='+(lon+0.002)+'&size=medium&mapfilter=true');
 			}
 		});
@@ -179,6 +209,7 @@ $(document).ready(function() {
 				var geom_loc =results[0].geometry.location;
 				map.setCenter(geom_loc);
 				markersNearby(geom_loc.lat(),geom_loc.lng());
+				getNearbyWiki(geom_loc.lat(),geom_loc.lng());
 			} else {
 				alert("Geocode was not successful for the following reason: " + status);
 			}
@@ -195,12 +226,30 @@ $(document).ready(function() {
 			}
 		}
 	}
+	function clearWiki() {
+		if (wikiArray)
+		{
+			var wikiArray_len = wikiArray.length, i;
+			for (i = 0; i < wikiArray_len; i++) {
+				wikiArray[i].setMap(null);
+			}
+		}
+	}
 	function showOverlays() {
 		if (markersArray)
 		{
 			var markersArray_len = markersArray.length, i;
 			for (i = 0; i < markersArray_len; i++) {
 				markersArray[i].setMap(map);
+			}
+		}
+	}
+	function showWiki() {
+		if (wikiArray)
+		{
+			var wikiArray_len = wikiArray.length, i;
+			for (i = 0; i < wikiArray_len; i++) {
+				wikiArray[i].setMap(map);
 			}
 		}
 	}
