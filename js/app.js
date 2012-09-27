@@ -5,7 +5,7 @@ $(document).ready(function() {
 	'lodging','museum','night_club','park','restaurant','spa','stadium','subway_station','train_station','zoo','natural_feature',
 	'point_of_interest'
 	];
-	var panoramioPhotosView = true, googlePlacesView = false;
+	var panoramioPhotosView = true, googlePlacesView = false, wikiView = false;
 	map_options = {
 		center: new google.maps.LatLng(lat, lon),
 		zoom: 14,
@@ -30,7 +30,9 @@ $(document).ready(function() {
 				markersNearby(lat,lon);
 				getNearbyWiki(lat,lon);
 				googlePlacesView = true;
+				wikiView = true;
 				$('input#places').attr('checked',true);
+				$('input#wiki').attr('checked',true);
 			},
 			function(error) {
 				var error_msg = '';
@@ -168,10 +170,8 @@ $(document).ready(function() {
 				var data_len = data.articles.length;
 				for(var i = 0; i < data_len; i+=1) 
 				{
-					
 					addMarkerWiki(data.articles[i]);
 				}
-				//console.log(data);
 				//console.log('http://www.panoramio.com/map/get_panoramas.php?set=public&from=0&to=20&minx='+(lat-0.002)+'&miny='+(lon-0.002)+'&maxx='+(lat+0.002)+'&maxy='+(lon+0.002)+'&size=medium&mapfilter=true');
 			}
 		});
@@ -199,6 +199,18 @@ $(document).ready(function() {
 			showOverlays();
 			$(this).attr('checked',true);
 			googlePlacesView = true;
+		}
+	});
+	$('input#wiki').change(function() {
+		if(wikiView==true) {
+			clearWiki();
+			$(this).attr('checked',false);
+			wikiView = false;
+		}
+		else {
+			showWiki();
+			$(this).attr('checked',true);
+			wikiView = true;
 		}
 	});
 	//search places by input

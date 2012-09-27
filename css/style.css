@@ -47,10 +47,7 @@ div#page {
 #top_bar img {
 	float:left;
 }
-#top_bar label {
-	
-}
-#places, #photos {
+#places, #photos, #wiki {
 	padding: 0;
     margin:0;
     vertical-align: bottom;
