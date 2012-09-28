@@ -222,6 +222,10 @@ $(document).ready(function() {
 				map.setCenter(geom_loc);
 				markersNearby(geom_loc.lat(),geom_loc.lng());
 				getNearbyWiki(geom_loc.lat(),geom_loc.lng());
+				googlePlacesView = true;
+				wikiView = true;
+				$('input#places').attr('checked',true);
+				$('input#wiki').attr('checked',true);
 			} else {
 				alert("Geocode was not successful for the following reason: " + status);
 			}
