@@ -1,5 +1,5 @@
 $(document).ready(function() {
-	var lat = 49.299181, lon = 19.9495621, mq, pano_options, map_options, map;
+	var lat = 48.8719414772291, lon = 2.3291015625, mq, pano_options, map_options, map;
 	var mapDiv = document.getElementById('map'),markersArray = [], wikiArray = [], infowindow = new google.maps.InfoWindow(),
 	places_types = ['store','airport','amusement_park','aquarium','art_gallery','atm','bar','bus_station','cafe','casino','food','grocery_or_supermarket',
 	'lodging','museum','night_club','park','restaurant','spa','stadium','subway_station','train_station','zoo','natural_feature',
@@ -10,9 +10,6 @@ $(document).ready(function() {
 		center: new google.maps.LatLng(lat, lon),
 		zoom: 14,
 		mapTypeId: google.maps.MapTypeId.ROADMAP
-		/*zoomControlOptions: {
-			position: google.maps.ControlPosition.LEFT_TOP
-		}*/
 	};
 	map = new google.maps.Map(mapDiv, map_options);
 	var iconType = {};//color:709A36
@@ -52,13 +49,13 @@ $(document).ready(function() {
 					break;
 				}
 				alert('Error occurred. '+error_msg);
-				lat = 49.299181;
-				lon = 19.9495621;
+				lat = 48.8719414772291;
+				lon = 2.3291015625;
 			});
 		}
 		else {
-			lat = 49.299181;
-			lon = 19.9495621;
+			lat = 48.8719414772291;
+			lon = 2.3291015625;
 			callback();
 			alert('Geolocation is not supported for this Browser/OS version yet.');
 		}
@@ -68,16 +65,10 @@ $(document).ready(function() {
 	getLocation(initApp);
 	function initApp()
 	{
-		//getNearbyPhotos(lat,lon);
-		//pano_options = {'rect': {'sw': {'lat': lat-0.002, 'lng': lon-0.002}, 'ne': {'lat': lat+0.002, 'lng': lon+0.002}}};
 		map.setCenter(new google.maps.LatLng(lat, lon));
 		google.maps.event.addListener(panoramioLayer, 'click', function(event) {
 			//console.log(event);
 		});
-		//init panoramio widget
-		//var photo_ex_options = {'width': w, 'height': h};
-		//var photo_ex_widget = new panoramio.PhotoWidget('pano_photos', pano_options, photo_ex_options);
-		//photo_ex_widget.setPosition(0);
 	}
 	function addMarker(place)
 	{
@@ -172,7 +163,6 @@ $(document).ready(function() {
 				{
 					addMarkerWiki(data.articles[i]);
 				}
-				//console.log('http://www.panoramio.com/map/get_panoramas.php?set=public&from=0&to=20&minx='+(lat-0.002)+'&miny='+(lon-0.002)+'&maxx='+(lat+0.002)+'&maxy='+(lon+0.002)+'&size=medium&mapfilter=true');
 			}
 		});
 	}
@@ -212,6 +202,10 @@ $(document).ready(function() {
 			$(this).attr('checked',true);
 			wikiView = true;
 		}
+	});
+	$('#info').click(function() {
+		$('#info_div').toggle();
+		return false;
 	});
 	//search places by input
 	$('#search_place').on('click',function() {
