@@ -67,12 +67,21 @@ a#info {
 	float:right;
 	margin:8px 5px 0 0;
 }
+div.checkboxes {
+	clear:both;
+	float: right;
+	margin-top:-20px;
+	margin-right:10px;
+}
 @media only screen and (max-width: 700px) {
 	#top_bar {
 		width: 100%;
-		min-width:315px;
+		min-width:320px;
 		left:0;
 		margin-left:0;
+	}
+	div.checkboxes {
+		margin-top:0;
 	}
 }
 #top_bar {

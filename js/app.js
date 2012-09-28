@@ -12,9 +12,45 @@ $(document).ready(function() {
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	};
 	map = new google.maps.Map(mapDiv, map_options);
-	var iconType = {};//color:709A36
+	var iconType = {};
 	for(var i=0;i<places_types.length;i++) {
 		iconType[places_types[i]] = "markers/"+places_types[i]+".png";
+	}
+	function clearOverlays() {
+		if (markersArray)
+		{
+			var markersArray_len = markersArray.length, i;
+			for (i = 0; i < markersArray_len; i++) {
+				markersArray[i].setMap(null);
+			}
+		}
+	}
+	function clearWiki() {
+		if (wikiArray)
+		{
+			var wikiArray_len = wikiArray.length, i;
+			for (i = 0; i < wikiArray_len; i++) {
+				wikiArray[i].setMap(null);
+			}
+		}
+	}
+	function showOverlays() {
+		if (markersArray)
+		{
+			var markersArray_len = markersArray.length, i;
+			for (i = 0; i < markersArray_len; i++) {
+				markersArray[i].setMap(map);
+			}
+		}
+	}
+	function showWiki() {
+		if (wikiArray)
+		{
+			var wikiArray_len = wikiArray.length, i;
+			for (i = 0; i < wikiArray_len; i++) {
+				wikiArray[i].setMap(map);
+			}
+		}
 	}
 	// check for Geolocation support
 	function getLocation(callback)
@@ -66,9 +102,6 @@ $(document).ready(function() {
 	function initApp()
 	{
 		map.setCenter(new google.maps.LatLng(lat, lon));
-		google.maps.event.addListener(panoramioLayer, 'click', function(event) {
-			//console.log(event);
-		});
 	}
 	function addMarker(place)
 	{
@@ -132,7 +165,7 @@ $(document).ready(function() {
 		{
 			if(status == google.maps.places.PlacesServiceStatus.ERROR) {
 				alert('There was a problem contacting the Google servers.');
-			} 
+			}
 			else if(status == google.maps.places.PlacesServiceStatus.INVALID_REQUEST) {
 				alert('This request was invalid.');
 			}
@@ -159,14 +192,14 @@ $(document).ready(function() {
 			cache: false,
 			success: function(data) {
 				var data_len = data.articles.length;
-				for(var i = 0; i < data_len; i+=1) 
+				for(var i = 0; i < data_len; i+=1)
 				{
 					addMarkerWiki(data.articles[i]);
 				}
 			}
 		});
 	}
-	
+
 	$('input#photos').change(function() {
 		if(panoramioPhotosView==true) {
 			panoramioLayer.setMap(null);
@@ -207,6 +240,12 @@ $(document).ready(function() {
 		$('#info_div').toggle();
 		return false;
 	});
+	$('#info_div').click(function() {
+		if($(this).css('display')=='block') {
+			$(this).hide();
+		}
+		return false;
+	});
 	//search places by input
 	$('#search_place').on('click',function() {
 		var place = $('#place').val();
@@ -223,45 +262,11 @@ $(document).ready(function() {
 			} else {
 				alert("Geocode was not successful for the following reason: " + status);
 			}
-		});		
+		});
 		return false;
 	});
-	
-	function clearOverlays() {
-		if (markersArray)
-		{
-			var markersArray_len = markersArray.length, i;
-			for (i = 0; i < markersArray_len; i++) {
-				markersArray[i].setMap(null);
-			}
-		}
-	}
-	function clearWiki() {
-		if (wikiArray)
-		{
-			var wikiArray_len = wikiArray.length, i;
-			for (i = 0; i < wikiArray_len; i++) {
-				wikiArray[i].setMap(null);
-			}
-		}
-	}
-	function showOverlays() {
-		if (markersArray)
-		{
-			var markersArray_len = markersArray.length, i;
-			for (i = 0; i < markersArray_len; i++) {
-				markersArray[i].setMap(map);
-			}
-		}
-	}
-	function showWiki() {
-		if (wikiArray)
-		{
-			var wikiArray_len = wikiArray.length, i;
-			for (i = 0; i < wikiArray_len; i++) {
-				wikiArray[i].setMap(map);
-			}
-		}
-	}
+	google.maps.event.addDomListener(window, 'resize', function() {
+		map.setCenter(new google.maps.LatLng(lat, lon));
+	});
 
-}); 
+});
